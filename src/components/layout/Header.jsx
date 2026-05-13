@@ -1,8 +1,10 @@
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { APP_CONFIG } from "@/config/app.config";
 
 export default function Header() {
   const { t, lang, setLang } = useLanguage();
+  const { logout, user } = useAuthContext();
 
   const now = new Date();
   const dateStr = now.toLocaleDateString(APP_CONFIG.dateLocale, {
@@ -22,9 +24,12 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold text-foreground">
-              {t("nav.admin")}
+              {user?.fullName || user?.username || t("nav.admin")}
             </span>
-            <button className="pos-btn-secondary text-xs px-3 py-1">
+            <button
+              className="pos-btn-secondary text-xs px-3 py-1"
+              onClick={logout}
+            >
               {t("nav.logout")}
             </button>
           </div>

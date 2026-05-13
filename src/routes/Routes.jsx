@@ -2,9 +2,14 @@
  * Routes Configuration
  * ---------------------
  * All application routes are defined here.
- * To add a new page: import it and add a route entry.
+ * Unauthenticated users are redirected to /login.
  */
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuthContext } from "@/contexts/AuthContext";
+import AppLayout from "@/components/layout/AppLayout";
+
+// Auth
+import LoginPage from "@/features/auth/LoginPage";
 
 // Sales
 import SalesPage from "@/features/sales/SalesPage";
@@ -44,47 +49,65 @@ import BackupPage from "@/features/backup/BackupPage";
 import HelpPage from "@/features/help/HelpPage";
 import NotFound from "@/features/NotFound";
 
+/** Wrapper that requires authentication. */
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, isLoading } = useAuthContext();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <AppLayout>{children}</AppLayout>;
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Sales */}
-      <Route path="/" element={<SalesPage />} />
-      <Route path="/sales-return" element={<SalesReturnPage />} />
-      <Route path="/sales-report" element={<SalesReportPage />} />
+      {/* Public */}
 
-      {/* Purchase */}
-      <Route path="/purchase-invoice" element={<PurchaseInvoicePage />} />
-      <Route path="/view-purchase-invoice" element={<ViewPurchaseInvoicePage />} />
+      <Route path="/login" element={<LoginPage />} />
 
-      {/* Inventory */}
-      <Route path="/add-product" element={<AddProductPage />} />
-      <Route path="/view-products" element={<ViewProductsPage />} />
-      <Route path="/stock" element={<StockPage />} />
-      <Route path="/stock-return" element={<StockReturnPage />} />
-      <Route path="/stock-correction" element={<StockCorrectionPage />} />
-      <Route path="/products-suppliers" element={<ProductsSuppliersPage />} />
-      <Route path="/supplier-credit" element={<SupplierCreditPage />} />
-      <Route path="/customer-credit" element={<CustomerCreditPage />} />
-      <Route path="/cash-adjustment" element={<CashAdjustmentPage />} />
+      {/* Protected — all wrapped in AppLayout */}
+      <Route path="/" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} />
+      <Route path="/sales-return" element={<ProtectedRoute><SalesReturnPage /></ProtectedRoute>} />
+      <Route path="/sales-report" element={<ProtectedRoute><SalesReportPage /></ProtectedRoute>} />
 
-      {/* Masters */}
-      <Route path="/add-supplier" element={<AddSupplierPage />} />
-      <Route path="/add-customer" element={<AddCustomerPage />} />
-      <Route path="/add-formulation" element={<AddFormulationPage />} />
-      <Route path="/add-user" element={<AddUserPage />} />
-      <Route path="/link-box" element={<LinkBoxPage />} />
-      <Route path="/delete-products" element={<DeleteProductsPage />} />
-      <Route path="/supplier-credit-master" element={<SupplierCreditMasterPage />} />
-      <Route path="/customer-credit-master" element={<CustomerCreditMasterPage />} />
+      <Route path="/purchase-invoice" element={<ProtectedRoute><PurchaseInvoicePage /></ProtectedRoute>} />
+      <Route path="/view-purchase-invoice" element={<ProtectedRoute><ViewPurchaseInvoicePage /></ProtectedRoute>} />
 
-      {/* Others */}
-      <Route path="/barcode" element={<BarcodePage />} />
-      <Route path="/expense" element={<ExpensePage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/backup" element={<BackupPage />} />
-      <Route path="/help" element={<HelpPage />} />
+      <Route path="/add-product" element={<ProtectedRoute><AddProductPage /></ProtectedRoute>} />
+      <Route path="/view-products" element={<ProtectedRoute><ViewProductsPage /></ProtectedRoute>} />
+      <Route path="/stock" element={<ProtectedRoute><StockPage /></ProtectedRoute>} />
+      <Route path="/stock-return" element={<ProtectedRoute><StockReturnPage /></ProtectedRoute>} />
+      <Route path="/stock-correction" element={<ProtectedRoute><StockCorrectionPage /></ProtectedRoute>} />
+      <Route path="/products-suppliers" element={<ProtectedRoute><ProductsSuppliersPage /></ProtectedRoute>} />
+      <Route path="/supplier-credit" element={<ProtectedRoute><SupplierCreditPage /></ProtectedRoute>} />
+      <Route path="/customer-credit" element={<ProtectedRoute><CustomerCreditPage /></ProtectedRoute>} />
+      <Route path="/cash-adjustment" element={<ProtectedRoute><CashAdjustmentPage /></ProtectedRoute>} />
 
-      {/* 404 */}
+      <Route path="/add-supplier" element={<ProtectedRoute><AddSupplierPage /></ProtectedRoute>} />
+      <Route path="/add-customer" element={<ProtectedRoute><AddCustomerPage /></ProtectedRoute>} />
+      <Route path="/add-formulation" element={<ProtectedRoute><AddFormulationPage /></ProtectedRoute>} />
+      <Route path="/add-user" element={<ProtectedRoute><AddUserPage /></ProtectedRoute>} />
+      <Route path="/link-box" element={<ProtectedRoute><LinkBoxPage /></ProtectedRoute>} />
+      <Route path="/delete-products" element={<ProtectedRoute><DeleteProductsPage /></ProtectedRoute>} />
+      <Route path="/supplier-credit-master" element={<ProtectedRoute><SupplierCreditMasterPage /></ProtectedRoute>} />
+      <Route path="/customer-credit-master" element={<ProtectedRoute><CustomerCreditMasterPage /></ProtectedRoute>} />
+
+      <Route path="/barcode" element={<ProtectedRoute><BarcodePage /></ProtectedRoute>} />
+      <Route path="/expense" element={<ProtectedRoute><ExpensePage /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+      <Route path="/backup" element={<ProtectedRoute><BackupPage /></ProtectedRoute>} />
+      <Route path="/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

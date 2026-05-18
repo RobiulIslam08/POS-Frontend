@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
 import { useCreateProductLink, useProductLinks } from "@/hooks/useProductLinks";
@@ -15,16 +15,33 @@ export default function LinkBoxPage() {
 
   const [form, setForm] = useState({ boxProductCode: "", singleProductCode: "", boxProductName: "", singleProductName: "", conversionQty: "", remark: "" });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (!allProducts.length) return;
+    setForm((prev) => {
+      const next = { ...prev };
+      if (prev.boxProductCode) {
+        const found = allProducts.find((pr) => pr.productCode === prev.boxProductCode || pr.productId === prev.boxProductCode);
+        if (found) next.boxProductName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
+      }
+      if (prev.singleProductCode) {
+        const found = allProducts.find((pr) => pr.productCode === prev.singleProductCode || pr.productId === prev.singleProductCode);
+        if (found) next.singleProductName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
+      }
+      return next;
+    });
+  }, [lang, allProducts]);
+
   const update = (k, v) => {
     setForm((p) => {
       const next = { ...p, [k]: v };
       if (k === "boxProductCode") {
         const found = allProducts.find((pr) => pr.productCode === v || pr.productId === v);
-        if (found) next.boxProductName = found.productName;
+        if (found) next.boxProductName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
       }
       if (k === "singleProductCode") {
         const found = allProducts.find((pr) => pr.productCode === v || pr.productId === v);
-        if (found) next.singleProductName = found.productName;
+        if (found) next.singleProductName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
       }
       return next;
     });

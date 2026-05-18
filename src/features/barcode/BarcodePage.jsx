@@ -67,13 +67,21 @@ export default function BarcodePage() {
   const [errors, setErrors] = useState({});
   const [generatedLabels, setGeneratedLabels] = useState([]);
 
+  useEffect(() => {
+    if (!allProducts.length || !form.productCode) return;
+    const found = allProducts.find((p) => p.productCode === form.productCode || p.productId === form.productCode);
+    if (found) {
+      setProductName(lang === "ar" ? (found.arabicName || found.productName) : found.productName);
+    }
+  }, [lang, allProducts, form.productCode]);
+
   const update = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     // Auto-lookup product when code changes
     if (key === "productCode") {
       const found = allProducts.find((p) => p.productCode === value || p.productId === value);
       if (found) {
-        setProductName(found.productName);
+        setProductName(lang === "ar" ? (found.arabicName || found.productName) : found.productName);
         // Auto-fill barcode value with product code if empty
         if (!form.barcodeValue) {
           setForm((prev) => ({ ...prev, productCode: value, barcodeValue: found.productCode }));

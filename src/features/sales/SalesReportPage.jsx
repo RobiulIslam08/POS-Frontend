@@ -339,12 +339,12 @@ export default function SalesReportPage() {
                       <span>{lang === "ar" ? "الصافي" : "Net Amount"}</span>
                       <span>SR {saleDetail.netAmount}</span>
                     </div>
-                    {saleDetail.balance !== undefined && (
+                    {/* {saleDetail.balance !== undefined && (
                       <div className="flex gap-12">
                         <span className="text-muted-foreground">{lang === "ar" ? "الباقي" : "Balance"}</span>
                         <span>SR {saleDetail.balance}</span>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               ) : (

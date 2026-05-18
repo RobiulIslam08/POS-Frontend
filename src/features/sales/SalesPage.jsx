@@ -7,7 +7,7 @@ import { useCreateSale } from "@/hooks/useSales";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 
 export default function SalesPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user } = useAuthContext();
   const { data: custData } = useCustomers();
   const { data: prodData } = useProducts({ limit: 5000 });
@@ -16,7 +16,7 @@ export default function SalesPage() {
   const customers = custData?.customers || [];
   const allProducts = prodData?.products || [];
 
-  const emptyRow = (id) => ({ id, code: "", productName: "", batchCode: "", expiryDate: "", type: "SINGLE", quantity: "", price: "", vat: "", total: "" });
+  const emptyRow = (id) => ({ id, code: "", productName: "", batchCode: "", expiryDate: "", type: "SINGLE", quantity: "", dbPrice: "", price: "", vat: "", total: "" });
   const [rows, setRows] = useState([emptyRow(1)]);
   const [customer, setCustomer] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
@@ -30,8 +30,9 @@ export default function SalesPage() {
 
   const totalAmount = rows.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
   const discountAmt = parseFloat(discount) || 0;
-  const vatAmt = (totalAmount - discountAmt) * (parseFloat(vatPercent) / 100);
-  const netAmount = totalAmount - discountAmt + vatAmt;
+  // Since row totals are inclusive of VAT, netAmount is simply totalAmount - discountAmt
+  const netAmount = totalAmount - discountAmt;
+  const vatAmt = (netAmount / (100 + parseFloat(vatPercent))) * parseFloat(vatPercent);
   
   // Auto-calculate balance
   useEffect(() => {
@@ -40,15 +41,34 @@ export default function SalesPage() {
     setBalance(bal.toFixed(2));
   }, [netAmount, amountPaid]);
 
-
-
+  // Sync rows' product names when language changes
+  useEffect(() => {
+    if (!allProducts.length) return;
+    setRows((prev) =>
+      prev.map((row) => {
+        if (!row.code) return row;
+        const found = allProducts.find((p) => p.productCode === row.code || p.productId === row.code);
+        if (found) {
+          const translatedName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
+          return { ...row, productName: translatedName };
+        }
+        return row;
+      })
+    );
+    if (summaryProductName) {
+      const found = allProducts.find((p) => p.productName === summaryProductName || p.arabicName === summaryProductName);
+      if (found) {
+        setSummaryProductName(lang === "ar" ? (found.arabicName || found.productName) : found.productName);
+      }
+    }
+  }, [lang, allProducts]);
 
   const updateRow = (id, field, value) => {
     let foundProduct = null;
     if (field === "code") {
       foundProduct = allProducts.find((p) => p.productCode === value || p.productId === value);
       if (foundProduct) {
-        setSummaryProductName(foundProduct.productName);
+        setSummaryProductName(lang === "ar" ? (foundProduct.arabicName || foundProduct.productName) : foundProduct.productName);
         setSummaryPrice(String(foundProduct.sellingPrice));
         setSummaryRemaining(String(foundProduct.quantity));
       } else {
@@ -64,20 +84,30 @@ export default function SalesPage() {
         const updated = { ...r, [field]: value };
 
         if (field === "code" && foundProduct) {
-          updated.productName = foundProduct.productName;
-          updated.price = String(foundProduct.sellingPrice || "");
+          updated.productName = lang === "ar" ? (foundProduct.arabicName || foundProduct.productName) : foundProduct.productName;
+          updated.dbPrice = String(foundProduct.sellingPrice || "");
         } else if (field === "code" && !foundProduct) {
           updated.productName = "";
-          updated.price = "";
+          updated.dbPrice = "";
         }
 
-        const qty = parseFloat(updated.quantity) || 0;
-        const price = parseFloat(updated.price) || 0;
-        const subtotal = qty * price;
-        const vatRate = parseFloat(vatPercent) / 100;
-        const vatVal = subtotal * vatRate;
+        if (field === "quantity" || field === "code") {
+          const qty = parseFloat(updated.quantity) || 0;
+          const dbP = parseFloat(updated.dbPrice) || 0;
+          const calculatedTotal = qty * dbP;
+          updated.total = calculatedTotal ? calculatedTotal.toFixed(2) : "";
+        } else if (field === "total") {
+          updated.total = value;
+        }
+
+        const currentTotal = parseFloat(updated.total) || 0;
+        const currentVatRate = parseFloat(vatPercent) || 15;
+        const x = currentTotal / (100 + currentVatRate);
+        const vatVal = x * currentVatRate;
+        const regularPrice = x * 100;
+        
         updated.vat = vatVal ? vatVal.toFixed(3) : "";
-        updated.total = subtotal ? (subtotal + vatVal).toFixed(2) : "";
+        updated.price = regularPrice ? regularPrice.toFixed(2) : "";
 
         return updated;
       });
@@ -153,9 +183,9 @@ export default function SalesPage() {
             <td><input type="date" className="pos-input" value={row.expiryDate} onChange={(e) => updateRow(row.id, "expiryDate", e.target.value)} /></td>
             <td><select className="pos-select" value={row.type} onChange={(e) => updateRow(row.id, "type", e.target.value)}><option value="SINGLE">{t("sales.single")}</option><option value="BOX">BOX</option></select></td>
             <td><input type="number" className="pos-input" value={row.quantity} onChange={(e) => updateRow(row.id, "quantity", e.target.value)} /></td>
-            <td><input type="number" className="pos-input" value={row.price} onChange={(e) => updateRow(row.id, "price", e.target.value)} /></td>
+            <td><input type="number" className="pos-input" value={row.price} readOnly /></td>
             <td className="text-sm">{row.vat}</td>
-            <td className="pos-amount text-sm">{row.total}</td>
+            <td className="pos-amount"><input type="number" className="pos-input" value={row.total} onChange={(e) => updateRow(row.id, "total", e.target.value)} /></td>
             <td><button onClick={() => removeRow(row.id)} className="text-destructive hover:opacity-70"><Trash2 size={14} /></button></td>
           </tr>))}
         </tbody>
@@ -166,7 +196,7 @@ export default function SalesPage() {
 
     {/* Payment section */}
     <div className="pos-card p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div><label className="pos-label">{t("sales.amountPaid")}</label><input type="number" className="pos-input" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} /></div>
         <div><label className="pos-label">{t("sales.balance")}</label><input type="number" className="pos-input" value={balance} onChange={(e) => setBalance(e.target.value)} /></div>
         <div><label className="pos-label">{t("sales.paymentMode")}</label><select className="pos-select" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}><option value="CREDIT CARD">{t("sales.creditCard")}</option><option value="CASH">{t("sales.cash")}</option></select></div>
@@ -178,7 +208,7 @@ export default function SalesPage() {
         <div><label className="pos-label">{t("sales.netAmount")}</label><div className="text-sm font-semibold">{netAmount.toFixed(2)}</div></div>
         <div><label className="pos-label">{t("sales.amountPaid")}</label><input type="number" className="pos-input" value={amountPaid} readOnly /></div>
         <div><label className="pos-label">{t("sales.balance")}</label><div className="text-sm">{balance}</div></div>
-      </div>
+      </div> */}
       <div className="flex justify-center gap-3 mt-6">
         <button onClick={() => window.print()} className="pos-btn-secondary">{t("sales.print")}</button>
         <button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createSale.isPending}>

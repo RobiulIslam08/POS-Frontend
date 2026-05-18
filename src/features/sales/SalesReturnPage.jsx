@@ -6,7 +6,7 @@ import { useCreateSalesReturn } from "@/hooks/useSales";
 import { Trash2, Plus, Loader2 } from "lucide-react";
 
 export default function SalesReturnPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user } = useAuthContext();
   const { data: prodData } = useProducts({ limit: 5000 });
   const createReturn = useCreateSalesReturn();
@@ -31,6 +31,21 @@ export default function SalesReturnPage() {
     setBalance(bal.toFixed(2));
   }, [netAmount, amountPaid]);
 
+  // Sync rows' product names when language changes
+  useEffect(() => {
+    if (!allProducts.length) return;
+    setRows((prev) =>
+      prev.map((row) => {
+        if (!row.code) return row;
+        const found = allProducts.find((p) => p.productCode === row.code || p.productId === row.code);
+        if (found) {
+          const translatedName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
+          return { ...row, productName: translatedName };
+        }
+        return row;
+      })
+    );
+  }, [lang, allProducts]);
 
   const updateRow = (id, field, value) => {
     setRows((prev) => prev.map((r) => {
@@ -38,7 +53,7 @@ export default function SalesReturnPage() {
       const updated = { ...r, [field]: value };
       if (field === "code") {
         const found = allProducts.find((p) => p.productCode === value || p.productId === value);
-        if (found) { updated.productName = found.productName; updated.price = String(found.sellingPrice || ""); }
+        if (found) { updated.productName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; updated.price = String(found.sellingPrice || ""); }
       }
       const qty = parseFloat(updated.quantity) || 0;
       const price = parseFloat(updated.price) || 0;

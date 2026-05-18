@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useSuppliers } from "@/hooks/useSuppliers";
@@ -29,6 +29,22 @@ export default function PurchaseInvoicePage() {
   const netAmount = rows.reduce((sum, r) => sum + (parseFloat(r.netAmount) || 0), 0);
   const totalAmount = netAmount - (parseFloat(discountTotal) || 0) + (parseFloat(vatTotal) || 0);
 
+  // Sync rows' item names when language changes
+  useEffect(() => {
+    if (!allProducts.length) return;
+    setRows((prev) =>
+      prev.map((row) => {
+        if (!row.barcode) return row;
+        const found = allProducts.find((p) => p.productCode === row.barcode || p.productId === row.barcode);
+        if (found) {
+          const translatedName = lang === "ar" ? (found.arabicName || found.productName) : found.productName;
+          return { ...row, itemName: translatedName };
+        }
+        return row;
+      })
+    );
+  }, [lang, allProducts]);
+
   const updateRow = (id, field, value) => {
     setRows((prev) => {
       let productFound = false;
@@ -39,7 +55,7 @@ export default function PurchaseInvoicePage() {
           const found = allProducts.find((p) => p.productCode === value || p.productId === value);
           if (found) { 
             productFound = true;
-            updated.itemName = found.productName; 
+            updated.itemName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; 
             updated.sellingPrice = String(found.sellingPrice || ""); 
             updated.purchasePrice = String(found.purchasePrice || ""); 
           }

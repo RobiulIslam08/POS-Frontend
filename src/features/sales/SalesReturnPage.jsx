@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -20,6 +20,17 @@ export default function SalesReturnPage() {
   const [amountPaid, setAmountPaid] = useState("");
   const [balance, setBalance] = useState("");
   const totalAmount = rows.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+  const discountAmt = parseFloat(discount) || 0;
+  const vatAmt = (totalAmount - discountAmt) * (parseFloat(vatPercent) / 100);
+  const netAmount = totalAmount - discountAmt + vatAmt;
+
+  // Auto-calculate balance
+  useEffect(() => {
+    const amtPaid = parseFloat(amountPaid) || 0;
+    const bal = amtPaid - netAmount;
+    setBalance(bal.toFixed(2));
+  }, [netAmount, amountPaid]);
+
 
   const updateRow = (id, field, value) => {
     setRows((prev) => prev.map((r) => {
@@ -41,8 +52,9 @@ export default function SalesReturnPage() {
     if (validItems.length === 0) return;
     createReturn.mutate({
       items: validItems.map((r) => ({ code: r.code, productName: r.productName, batchCode: r.batchCode || undefined, expiryDate: r.expiryDate || undefined, type: r.type, quantity: Number(r.quantity), price: Number(r.price), total: Number(r.total) })),
-      totalAmount, discount: parseFloat(discount) || 0, vatPercent: Number(vatPercent), netAmount: totalAmount,
+      totalAmount, discount: discountAmt, vatPercent: Number(vatPercent), netAmount,
       amountPaid: Number(amountPaid) || 0, balance: Number(balance) || 0, paymentMode, createdBy: user?.username || "system",
+
     }, { onSuccess: () => { setRows([emptyRow(1)]); setAmountPaid(""); setBalance(""); setDiscount(""); } });
   };
 
@@ -64,12 +76,12 @@ export default function SalesReturnPage() {
         <div><label className="pos-label">{t("sales.paymentMode")}</label><select className="pos-select" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}><option value="CASH">{t("sales.cash")}</option><option value="CREDIT CARD">{t("sales.creditCard")}</option></select></div>
         <div><label className="pos-label">{t("sales.discount")}</label><input type="number" className="pos-input" value={discount} onChange={(e) => setDiscount(e.target.value)} /></div>
         <div><label className="pos-label">{t("sales.vatPercent")}</label><input type="number" className="pos-input" value={vatPercent} onChange={(e) => setVatPercent(e.target.value)} /></div>
-        <div><label className="pos-label">{t("sales.netAmount")}</label><div className="text-sm font-semibold">{totalAmount.toFixed(2)}</div></div>
+        <div><label className="pos-label">{t("sales.netAmount")}</label><div className="text-sm font-semibold">{netAmount.toFixed(2)}</div></div>
         <div><label className="pos-label">{t("sales.amountPaid")}</label><input type="number" className="pos-input" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} /></div>
         <div><label className="pos-label">{t("sales.balance")}</label><input type="number" className="pos-input" value={balance} onChange={(e) => setBalance(e.target.value)} /></div>
       </div>
       <div className="flex justify-center gap-3 mt-6">
-        <button className="pos-btn-secondary">{t("sales.print")}</button>
+        <button onClick={() => window.print()} className="pos-btn-secondary">{t("sales.print")}</button>
         <button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createReturn.isPending}>{createReturn.isPending && <Loader2 size={14} className="animate-spin" />} {t("sales.save")}</button>
       </div>
     </div>

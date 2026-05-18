@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCreateProduct } from "@/hooks/useProducts";
+import { useFormulations } from "@/hooks/useFormulations";
 import { Loader2 } from "lucide-react";
 
 export default function AddProductPage() {
   const { t } = useLanguage();
   const createProduct = useCreateProduct();
-
+  const { data: formulationData } = useFormulations();
+  const formulations = formulationData?.formulations || [];
 
   const initialForm = {
     productId: "",
@@ -23,6 +25,7 @@ export default function AddProductPage() {
     minQty: "1",
     productType: "SINGLE",
     boxQty: "1",
+    formulation: "",
   };
 
   const [form, setForm] = useState(initialForm);
@@ -47,6 +50,7 @@ export default function AddProductPage() {
       minQty: Number(form.minQty) || 1,
       productType: form.productType,
       boxQty: Number(form.boxQty) || 1,
+      formulation: form.formulation || undefined,
     };
 
     createProduct.mutate(payload, {
@@ -129,6 +133,17 @@ export default function AddProductPage() {
               <label className="pos-label">{t("addProduct.boxQty")}</label>
               <input type="number" className="pos-input w-24" value={form.boxQty} onChange={(e) => update("boxQty", e.target.value)} />
             </div>
+          </div>
+          <div>
+            <label className="pos-label">{t("addProduct.formulation")}</label>
+            <select className="pos-select" value={form.formulation} onChange={(e) => update("formulation", e.target.value)}>
+              <option value="">{t("addProduct.select")}</option>
+              {formulations.map((f) => (
+                <option key={f._id} value={f.formulationName}>
+                  {f.formulationName}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

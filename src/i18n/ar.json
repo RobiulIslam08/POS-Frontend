@@ -111,6 +111,7 @@
   "addProduct.minQty": "الحد الأدنى للكمية",
   "addProduct.productType": "نوع المنتج",
   "addProduct.boxQty": "كمية الصندوق",
+  "addProduct.formulation": "التركيبة",
   "addProduct.save": "حفظ",
   "addProduct.reset": "إعادة تعيين",
   "addProduct.select": "اختر",

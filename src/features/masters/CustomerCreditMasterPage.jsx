@@ -52,6 +52,7 @@ export default function CustomerCreditMasterPage() {
 
       <div className="pos-card p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
+          <label className="pos-label">{lang === "ar" ? "العميل" : "Customer"}</label>
           <select className="pos-select" value={form.customer} onChange={(e) => update("customer", e.target.value)}>
             <option value="">{lang === "ar" ? "اختر العميل" : "Select Customer"}</option>
             {customers.map((c) => <option key={c._id} value={c._id}>{c.customerName} ({c.customerCode})</option>)}
@@ -59,22 +60,29 @@ export default function CustomerCreditMasterPage() {
           {errors.customer && <p className="text-xs text-destructive mt-1">{errors.customer}</p>}
         </div>
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "رقم الفاتورة" : "Bill No"} value={form.billNo} onChange={(e) => update("billNo", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "رقم الفاتورة" : "Bill No"}</label>
+          <input className="pos-input" value={form.billNo} onChange={(e) => update("billNo", e.target.value)} />
           {errors.billNo && <p className="text-xs text-destructive mt-1">{errors.billNo}</p>}
         </div>
         <div>
-          <input className="pos-input" type="number" placeholder={lang === "ar" ? "مبلغ الائتمان" : "Credit Amount (Due)"} value={form.dueAmount} onChange={(e) => update("dueAmount", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "مبلغ الائتمان" : "Credit Amount (Due)"}</label>
+          <input className="pos-input" type="number" value={form.dueAmount} onChange={(e) => update("dueAmount", e.target.value)} />
           {errors.dueAmount && <p className="text-xs text-destructive mt-1">{errors.dueAmount}</p>}
         </div>
         <div>
-          <input className="pos-input" type="number" placeholder={lang === "ar" ? "المبلغ المستلم" : "Received Amount"} value={form.receivedAmount} onChange={(e) => update("receivedAmount", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "المبلغ المستلم" : "Received Amount"}</label>
+          <input className="pos-input" type="number" value={form.receivedAmount} onChange={(e) => update("receivedAmount", e.target.value)} />
           {errors.receivedAmount && <p className="text-xs text-destructive mt-1">{errors.receivedAmount}</p>}
         </div>
         <div>
+          <label className="pos-label">{lang === "ar" ? "تاريخ الدفع" : "Payment Date"}</label>
           <input className="pos-input" type="date" value={form.paymentDate} onChange={(e) => update("paymentDate", e.target.value)} />
           {errors.paymentDate && <p className="text-xs text-destructive mt-1">{errors.paymentDate}</p>}
         </div>
-        <input className="pos-input" placeholder={lang === "ar" ? "ملاحظات" : "Remarks"} value={form.remarks} onChange={(e) => update("remarks", e.target.value)} />
+        <div>
+          <label className="pos-label">{lang === "ar" ? "ملاحظات" : "Remarks"}</label>
+          <input className="pos-input" value={form.remarks} onChange={(e) => update("remarks", e.target.value)} />
+        </div>
         <div className="md:col-span-2 rounded-md border border-border bg-background/60 px-3 py-2 text-sm flex justify-between">
           <span>{lang === "ar" ? "المتبقي" : "Remaining"}</span>
           <strong>SR {remaining}</strong>

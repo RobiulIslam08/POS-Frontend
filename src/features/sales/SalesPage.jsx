@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useCustomers } from "@/hooks/useCustomers";
@@ -32,40 +32,66 @@ export default function SalesPage() {
   const discountAmt = parseFloat(discount) || 0;
   const vatAmt = (totalAmount - discountAmt) * (parseFloat(vatPercent) / 100);
   const netAmount = totalAmount - discountAmt + vatAmt;
+  
+  // Auto-calculate balance
+  useEffect(() => {
+    const amtPaid = parseFloat(amountPaid) || 0;
+    const bal = amtPaid - netAmount;
+    setBalance(bal.toFixed(2));
+  }, [netAmount, amountPaid]);
 
-  // When user enters a product code, look it up and auto-fill
-  const handleCodeChange = useCallback((rowId, code) => {
-    setRows((prev) => prev.map((r) => {
-      if (r.id !== rowId) return r;
-      const updated = { ...r, code };
-      const found = allProducts.find((p) => p.productCode === code || p.productId === code);
-      if (found) {
-        updated.productName = found.productName;
-        updated.price = String(found.sellingPrice || "");
-        updated.vat = found.vat ? ((parseFloat(updated.quantity) || 0) * found.sellingPrice * (found.vat / 100)).toFixed(3) : "";
-        setSummaryProductName(found.productName);
-        setSummaryPrice(String(found.sellingPrice));
-        setSummaryRemaining(String(found.quantity));
-      }
-      return updated;
-    }));
-  }, [allProducts]);
+
+
 
   const updateRow = (id, field, value) => {
-    setRows((prev) => prev.map((r) => {
-      if (r.id !== id) return r;
-      const updated = { ...r, [field]: value };
-      const qty = parseFloat(updated.quantity) || 0;
-      const price = parseFloat(updated.price) || 0;
-      const subtotal = qty * price;
-      const vatAmt = subtotal * 0.15;
-      updated.vat = vatAmt ? vatAmt.toFixed(3) : "";
-      updated.total = subtotal ? (subtotal + vatAmt).toFixed(2) : "";
-      return updated;
-    }));
+    let foundProduct = null;
+    if (field === "code") {
+      foundProduct = allProducts.find((p) => p.productCode === value || p.productId === value);
+      if (foundProduct) {
+        setSummaryProductName(foundProduct.productName);
+        setSummaryPrice(String(foundProduct.sellingPrice));
+        setSummaryRemaining(String(foundProduct.quantity));
+      } else {
+        setSummaryProductName("");
+        setSummaryPrice("");
+        setSummaryRemaining("");
+      }
+    }
+
+    setRows((prev) => {
+      const newRows = prev.map((r) => {
+        if (r.id !== id) return r;
+        const updated = { ...r, [field]: value };
+
+        if (field === "code" && foundProduct) {
+          updated.productName = foundProduct.productName;
+          updated.price = String(foundProduct.sellingPrice || "");
+        } else if (field === "code" && !foundProduct) {
+          updated.productName = "";
+          updated.price = "";
+        }
+
+        const qty = parseFloat(updated.quantity) || 0;
+        const price = parseFloat(updated.price) || 0;
+        const subtotal = qty * price;
+        const vatRate = parseFloat(vatPercent) / 100;
+        const vatVal = subtotal * vatRate;
+        updated.vat = vatVal ? vatVal.toFixed(3) : "";
+        updated.total = subtotal ? (subtotal + vatVal).toFixed(2) : "";
+
+        return updated;
+      });
+
+      if (field === "code" && foundProduct && newRows[newRows.length - 1].id === id) {
+        const nextId = newRows.length > 0 ? Math.max(...newRows.map(r => r.id)) + 1 : 1;
+        newRows.push(emptyRow(nextId));
+      }
+
+      return newRows;
+    });
   };
 
-  const addRow = () => setRows((prev) => [...prev, emptyRow(prev.length + 1)]);
+  const addRow = () => setRows((prev) => [...prev, emptyRow(prev.length > 0 ? Math.max(...prev.map(r => r.id)) + 1 : 1)]);
   const removeRow = (id) => { if (rows.length <= 1) return; setRows((prev) => prev.filter((r) => r.id !== id)); };
 
   const handleSave = () => {
@@ -121,7 +147,7 @@ export default function SalesPage() {
         <tbody>
           {rows.map((row) => (<tr key={row.id}>
             <td>{row.id}</td>
-            <td><input type="text" className="pos-input" value={row.code} onChange={(e) => { updateRow(row.id, "code", e.target.value); handleCodeChange(row.id, e.target.value); }} /></td>
+            <td><input type="text" className="pos-input" value={row.code} onChange={(e) => updateRow(row.id, "code", e.target.value)} /></td>
             <td><input type="text" className="pos-input" value={row.productName} onChange={(e) => updateRow(row.id, "productName", e.target.value)} /></td>
             <td><input type="text" className="pos-input" value={row.batchCode} onChange={(e) => updateRow(row.id, "batchCode", e.target.value)} /></td>
             <td><input type="date" className="pos-input" value={row.expiryDate} onChange={(e) => updateRow(row.id, "expiryDate", e.target.value)} /></td>
@@ -154,7 +180,7 @@ export default function SalesPage() {
         <div><label className="pos-label">{t("sales.balance")}</label><div className="text-sm">{balance}</div></div>
       </div>
       <div className="flex justify-center gap-3 mt-6">
-        <button className="pos-btn-secondary">{t("sales.print")}</button>
+        <button onClick={() => window.print()} className="pos-btn-secondary">{t("sales.print")}</button>
         <button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createSale.isPending}>
           {createSale.isPending && <Loader2 size={14} className="animate-spin" />} {t("sales.save")}
         </button>

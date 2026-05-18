@@ -15,12 +15,18 @@ export function getNavItems(t) {
     {
       key: "sales",
       label: t("nav.sales"),
-      path: "/",
+      children: [
+        { key: "newSales", label: t("sales.title"), path: "/" },
+        { key: "salesReturn", label: t("salesReturn.title"), path: "/sales-return" },
+      ],
     },
     {
       key: "purchase",
       label: t("nav.purchase"),
-      path: "/purchase-invoice",
+      children: [
+        { key: "newPurchase", label: t("purchase.title"), path: "/purchase-invoice" },
+        { key: "viewPurchase", label: t("viewPurchase.title"), path: "/view-purchase-invoice" },
+      ],
     },
     {
       key: "inventory",
@@ -76,10 +82,10 @@ export function getNavItems(t) {
       label: t("nav.backup"),
       path: "/backup",
     },
-    {
-      key: "help",
-      label: t("nav.help"),
-      path: "/help",
-    },
+    // {
+    //   key: "help",
+    //   label: t("nav.help"),
+    //   path: "/help",
+    // },
   ];
 }

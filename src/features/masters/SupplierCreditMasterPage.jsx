@@ -55,6 +55,7 @@ export default function SupplierCreditMasterPage() {
 
       <div className="pos-card p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
+          <label className="pos-label">{lang === "ar" ? "المورد" : "Supplier"}</label>
           <select className="pos-select" value={form.supplier} onChange={(e) => update("supplier", e.target.value)}>
             <option value="">{lang === "ar" ? "اختر المورد" : "Select Supplier"}</option>
             {suppliers.map((s) => <option key={s._id} value={s._id}>{s.supplierName} ({s.supplierCode})</option>)}
@@ -62,26 +63,39 @@ export default function SupplierCreditMasterPage() {
           {errors.supplier && <p className="text-xs text-destructive mt-1">{errors.supplier}</p>}
         </div>
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "رقم الفاتورة" : "Invoice No"} value={form.invoiceNo} onChange={(e) => update("invoiceNo", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "رقم الفاتورة" : "Invoice No"}</label>
+          <input className="pos-input" value={form.invoiceNo} onChange={(e) => update("invoiceNo", e.target.value)} />
           {errors.invoiceNo && <p className="text-xs text-destructive mt-1">{errors.invoiceNo}</p>}
         </div>
         <div>
-          <input className="pos-input" type="number" placeholder={lang === "ar" ? "مبلغ الائتمان" : "Credit Amount (Due)"} value={form.dueAmount} onChange={(e) => update("dueAmount", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "مبلغ الائتمان" : "Credit Amount (Due)"}</label>
+          <input className="pos-input" type="number" value={form.dueAmount} onChange={(e) => update("dueAmount", e.target.value)} />
           {errors.dueAmount && <p className="text-xs text-destructive mt-1">{errors.dueAmount}</p>}
         </div>
         <div>
-          <input className="pos-input" type="number" placeholder={lang === "ar" ? "المبلغ المسدد" : "Settled Amount (Paid)"} value={form.paidAmount} onChange={(e) => update("paidAmount", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "المبلغ المسدد" : "Settled Amount (Paid)"}</label>
+          <input className="pos-input" type="number" value={form.paidAmount} onChange={(e) => update("paidAmount", e.target.value)} />
           {errors.paidAmount && <p className="text-xs text-destructive mt-1">{errors.paidAmount}</p>}
         </div>
         <div>
+          <label className="pos-label">{lang === "ar" ? "تاريخ الدفع" : "Payment Date"}</label>
           <input className="pos-input" type="date" value={form.paymentDate} onChange={(e) => update("paymentDate", e.target.value)} />
           {errors.paymentDate && <p className="text-xs text-destructive mt-1">{errors.paymentDate}</p>}
         </div>
-        <select className="pos-select" value={form.paymentMethod} onChange={(e) => update("paymentMethod", e.target.value)}>
-          <option>Cash</option><option>Card</option><option>Bank Transfer</option>
-        </select>
-        <input className="pos-input" placeholder={lang === "ar" ? "المرجع" : "Reference"} value={form.reference} onChange={(e) => update("reference", e.target.value)} />
-        <input className="pos-input" placeholder={lang === "ar" ? "ملاحظات" : "Remarks"} value={form.remarks} onChange={(e) => update("remarks", e.target.value)} />
+        <div>
+          <label className="pos-label">{lang === "ar" ? "طريقة الدفع" : "Payment Mode"}</label>
+          <select className="pos-select" value={form.paymentMethod} onChange={(e) => update("paymentMethod", e.target.value)}>
+            <option>Cash</option><option>Card</option><option>Bank Transfer</option>
+          </select>
+        </div>
+        <div>
+          <label className="pos-label">{lang === "ar" ? "المرجع" : "Reference"}</label>
+          <input className="pos-input" value={form.reference} onChange={(e) => update("reference", e.target.value)} />
+        </div>
+        <div>
+          <label className="pos-label">{lang === "ar" ? "ملاحظات" : "Remarks"}</label>
+          <input className="pos-input" value={form.remarks} onChange={(e) => update("remarks", e.target.value)} />
+        </div>
         <div className="md:col-span-2 rounded-md border border-border bg-background/60 px-3 py-2 text-sm flex justify-between">
           <span>{lang === "ar" ? "المتبقي" : "Remaining"}</span>
           <strong>SR {remaining}</strong>

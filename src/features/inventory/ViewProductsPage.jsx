@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts, useUpdateProduct } from "@/hooks/useProducts";
+import { useFormulations } from "@/hooks/useFormulations";
 import { Search, Pencil, Check, X, Loader2 } from "lucide-react";
 
 export default function ViewProductsPage() {
@@ -12,8 +13,10 @@ export default function ViewProductsPage() {
   const [editForm, setEditForm] = useState({});
 
   const { data, isLoading, isFetching } = useProducts(searchParams);
+  const { data: formulationData } = useFormulations();
   const updateProduct = useUpdateProduct();
   const products = data?.products || [];
+  const formulations = formulationData?.formulations || [];
 
   const handleSearch = () => {
     if (!keyword.trim() || searchBy === "Select") { setSearchParams({}); return; }
@@ -25,13 +28,13 @@ export default function ViewProductsPage() {
 
   const startEdit = useCallback((product) => {
     setEditingId(product._id);
-    setEditForm({ productName: product.productName, arabicName: product.arabicName || "", vat: product.vat, mrp: product.mrp, purchasePrice: product.purchasePrice, sellingPrice: product.sellingPrice, quantity: product.quantity, minQty: product.minQty, storage: product.storage || "" });
+    setEditForm({ productName: product.productName, formulation: product.formulation || "", arabicName: product.arabicName || "", vat: product.vat, mrp: product.mrp, purchasePrice: product.purchasePrice, sellingPrice: product.sellingPrice, quantity: product.quantity, minQty: product.minQty, storage: product.storage || "" });
   }, []);
 
   const cancelEdit = () => { setEditingId(null); setEditForm({}); };
 
   const saveEdit = () => {
-    updateProduct.mutate({ id: editingId, data: { productName: editForm.productName, arabicName: editForm.arabicName || undefined, vat: Number(editForm.vat), mrp: Number(editForm.mrp), purchasePrice: Number(editForm.purchasePrice), sellingPrice: Number(editForm.sellingPrice), quantity: Number(editForm.quantity), minQty: Number(editForm.minQty), storage: editForm.storage || undefined } }, { onSuccess: cancelEdit });
+    updateProduct.mutate({ id: editingId, data: { productName: editForm.productName, formulation: editForm.formulation || undefined, arabicName: editForm.arabicName || undefined, vat: Number(editForm.vat), mrp: Number(editForm.mrp), purchasePrice: Number(editForm.purchasePrice), sellingPrice: Number(editForm.sellingPrice), quantity: Number(editForm.quantity), minQty: Number(editForm.minQty), storage: editForm.storage || undefined } }, { onSuccess: cancelEdit });
   };
 
   const ef = (key, val) => setEditForm((f) => ({ ...f, [key]: val }));
@@ -54,7 +57,16 @@ export default function ViewProductsPage() {
           : products.map((p) => (<tr key={p._id}>
             <td>{p.productCode}</td>
             <td>{editingId === p._id ? <input className="pos-input" value={editForm.productName} onChange={(e) => ef("productName", e.target.value)} /> : p.productName}</td>
-            <td>{p.formulation || "—"}</td>
+            <td>
+              {editingId === p._id ? (
+                <select className="pos-select" value={editForm.formulation} onChange={(e) => ef("formulation", e.target.value)}>
+                  <option value="">—</option>
+                  {formulations.map((f) => <option key={f._id} value={f.formulationName}>{f.formulationName}</option>)}
+                </select>
+              ) : (
+                p.formulation || "—"
+              )}
+            </td>
             <td>{editingId === p._id ? <select className="pos-select" value={editForm.vat} onChange={(e) => ef("vat", e.target.value)}><option value="0">0%</option><option value="5">5%</option><option value="15">15%</option></select> : `${p.vat}%`}</td>
             <td>{editingId === p._id ? <input className="pos-input" dir="rtl" value={editForm.arabicName} onChange={(e) => ef("arabicName", e.target.value)} /> : p.arabicName || "—"}</td>
             <td>{editingId === p._id ? <input className="pos-input" value={editForm.storage} onChange={(e) => ef("storage", e.target.value)} /> : p.storage || "—"}</td>

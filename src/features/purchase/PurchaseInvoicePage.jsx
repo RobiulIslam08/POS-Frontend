@@ -30,19 +30,34 @@ export default function PurchaseInvoicePage() {
   const totalAmount = netAmount - (parseFloat(discountTotal) || 0) + (parseFloat(vatTotal) || 0);
 
   const updateRow = (id, field, value) => {
-    setRows((prev) => prev.map((r) => {
-      if (r.id !== id) return r;
-      const updated = { ...r, [field]: value };
-      if (field === "barcode") {
-        const found = allProducts.find((p) => p.productCode === value || p.productId === value);
-        if (found) { updated.itemName = found.productName; updated.sellingPrice = String(found.sellingPrice || ""); updated.purchasePrice = String(found.purchasePrice || ""); }
+    setRows((prev) => {
+      let productFound = false;
+      const newRows = prev.map((r) => {
+        if (r.id !== id) return r;
+        const updated = { ...r, [field]: value };
+        if (field === "barcode") {
+          const found = allProducts.find((p) => p.productCode === value || p.productId === value);
+          if (found) { 
+            productFound = true;
+            updated.itemName = found.productName; 
+            updated.sellingPrice = String(found.sellingPrice || ""); 
+            updated.purchasePrice = String(found.purchasePrice || ""); 
+          }
+        }
+        const qty = parseFloat(updated.totalQty) || 0;
+        const price = parseFloat(updated.purchasePrice) || 0;
+        const disc = parseFloat(updated.discountAmt) || 0;
+        updated.netAmount = (qty * price - disc).toFixed(2);
+        return updated;
+      });
+
+      if (productFound && newRows[newRows.length - 1].id === id) {
+        const nextId = newRows.length > 0 ? Math.max(...newRows.map(r => r.id)) + 1 : 1;
+        newRows.push(emptyRow(nextId));
       }
-      const qty = parseFloat(updated.totalQty) || 0;
-      const price = parseFloat(updated.purchasePrice) || 0;
-      const disc = parseFloat(updated.discountAmt) || 0;
-      updated.netAmount = (qty * price - disc).toFixed(2);
-      return updated;
-    }));
+
+      return newRows;
+    });
   };
 
   const handleSave = () => {
@@ -68,7 +83,7 @@ export default function PurchaseInvoicePage() {
     </div>
 
     <div className="pos-card overflow-x-auto">
-      <div className="flex justify-end p-3"><button onClick={() => setRows((p) => [...p, emptyRow(p.length + 1)])} className="pos-btn-secondary gap-1"><Plus size={14} /> {t("purchase.addRow")}</button></div>
+      <div className="flex justify-end p-3"><button onClick={() => setRows((p) => [...p, emptyRow(p.length > 0 ? Math.max(...p.map(r => r.id)) + 1 : 1)])} className="pos-btn-secondary gap-1"><Plus size={14} /> {t("purchase.addRow")}</button></div>
       <table className="pos-table min-w-[1100px]">
         <thead><tr><th className="w-14">{t("purchase.itemNo")}</th><th className="w-28">{t("purchase.itemBarcode")}</th><th>{t("purchase.itemName")}</th><th>{t("purchase.batch")}</th><th>{t("sales.expiryDate")}</th><th className="w-20">{t("purchase.totalQty")}</th><th className="w-16">{t("purchase.free")}</th><th>{t("purchase.sellingPrice")}</th><th>{t("purchase.discountAmt")}</th><th>{t("purchase.discountPercent")}</th><th>{t("purchase.purchasePrice")}</th><th>{t("purchase.netAmount")}</th><th className="w-10"></th></tr></thead>
         <tbody>{rows.map((row) => (<tr key={row.id}><td>{row.id}</td><td><input type="text" className="pos-input" value={row.barcode} onChange={(e) => updateRow(row.id, "barcode", e.target.value)} /></td><td><input type="text" className="pos-input" value={row.itemName} onChange={(e) => updateRow(row.id, "itemName", e.target.value)} /></td><td><input type="text" className="pos-input" value={row.batch} onChange={(e) => updateRow(row.id, "batch", e.target.value)} /></td><td><input type="date" className="pos-input" value={row.expiryDate} onChange={(e) => updateRow(row.id, "expiryDate", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.totalQty} onChange={(e) => updateRow(row.id, "totalQty", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.free} onChange={(e) => updateRow(row.id, "free", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.sellingPrice} onChange={(e) => updateRow(row.id, "sellingPrice", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.discountAmt} onChange={(e) => updateRow(row.id, "discountAmt", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.discountPercent} onChange={(e) => updateRow(row.id, "discountPercent", e.target.value)} /></td><td><input type="number" className="pos-input" value={row.purchasePrice} onChange={(e) => updateRow(row.id, "purchasePrice", e.target.value)} /></td><td className="pos-amount text-sm">{row.netAmount}</td><td><button onClick={() => rows.length > 1 && setRows((p) => p.filter((r) => r.id !== row.id))} className="text-destructive hover:opacity-70"><Trash2 size={14} /></button></td></tr>))}</tbody>

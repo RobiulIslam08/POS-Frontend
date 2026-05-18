@@ -18,12 +18,12 @@ export default function AddSupplierPage() {
   return (<div className="space-y-4">
     <h2 className="pos-page-title">{t("masters.addSupplier")}</h2>
     <div className="pos-card p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input className="pos-input" placeholder={labels.code} value={form.supplierCode} onChange={(e) => update("supplierCode", e.target.value)} />
-      <input className="pos-input" placeholder={labels.name} value={form.supplierName} onChange={(e) => update("supplierName", e.target.value)} />
-      <input className="pos-input" placeholder={labels.contact} value={form.contactPerson} onChange={(e) => update("contactPerson", e.target.value)} />
-      <input className="pos-input" placeholder={labels.phone} value={form.phone} onChange={(e) => update("phone", e.target.value)} />
-      <input className="pos-input" type="number" placeholder={labels.credit} value={form.creditLimit} onChange={(e) => update("creditLimit", e.target.value)} />
-      <input className="pos-input" placeholder={labels.address} value={form.address} onChange={(e) => update("address", e.target.value)} />
+      <div><label className="pos-label">{labels.code}</label><input className="pos-input" value={form.supplierCode} onChange={(e) => update("supplierCode", e.target.value)} /></div>
+      <div><label className="pos-label">{labels.name}</label><input className="pos-input" value={form.supplierName} onChange={(e) => update("supplierName", e.target.value)} /></div>
+      <div><label className="pos-label">{labels.contact}</label><input className="pos-input" value={form.contactPerson} onChange={(e) => update("contactPerson", e.target.value)} /></div>
+      <div><label className="pos-label">{labels.phone}</label><input className="pos-input" value={form.phone} onChange={(e) => update("phone", e.target.value)} /></div>
+      <div><label className="pos-label">{labels.credit}</label><input className="pos-input" type="number" value={form.creditLimit} onChange={(e) => update("creditLimit", e.target.value)} /></div>
+      <div><label className="pos-label">{labels.address}</label><input className="pos-input" value={form.address} onChange={(e) => update("address", e.target.value)} /></div>
     </div>
     <div className="flex justify-center"><button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createSupplier.isPending}>{createSupplier.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} {labels.save}</button></div>
   </div>);

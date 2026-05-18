@@ -60,26 +60,34 @@ export default function LinkBoxPage() {
       <h2 className="pos-page-title">{t("masters.linkBox")}</h2>
       <div className="pos-card p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "كود منتج العبوة" : "Box Product Code"} value={form.boxProductCode} onChange={(e) => update("boxProductCode", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "كود منتج العبوة" : "Box Product Code"}</label>
+          <input className="pos-input" value={form.boxProductCode} onChange={(e) => update("boxProductCode", e.target.value)} />
           {errors.boxProductCode && <p className="text-xs text-destructive mt-1">{errors.boxProductCode}</p>}
         </div>
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "كود المنتج الفردي" : "Single Product Code"} value={form.singleProductCode} onChange={(e) => update("singleProductCode", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "كود المنتج الفردي" : "Single Product Code"}</label>
+          <input className="pos-input" value={form.singleProductCode} onChange={(e) => update("singleProductCode", e.target.value)} />
           {errors.singleProductCode && <p className="text-xs text-destructive mt-1">{errors.singleProductCode}</p>}
         </div>
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "اسم منتج العبوة" : "Box Product Name"} value={form.boxProductName} onChange={(e) => update("boxProductName", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "اسم منتج العبوة" : "Box Product Name"}</label>
+          <input className="pos-input" value={form.boxProductName} onChange={(e) => update("boxProductName", e.target.value)} />
           {errors.boxProductName && <p className="text-xs text-destructive mt-1">{errors.boxProductName}</p>}
         </div>
         <div>
-          <input className="pos-input" placeholder={lang === "ar" ? "اسم المنتج الفردي" : "Single Product Name"} value={form.singleProductName} onChange={(e) => update("singleProductName", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "اسم المنتج الفردي" : "Single Product Name"}</label>
+          <input className="pos-input" value={form.singleProductName} onChange={(e) => update("singleProductName", e.target.value)} />
           {errors.singleProductName && <p className="text-xs text-destructive mt-1">{errors.singleProductName}</p>}
         </div>
         <div>
-          <input className="pos-input" type="number" placeholder={lang === "ar" ? "كمية التحويل" : "Conversion Qty"} value={form.conversionQty} onChange={(e) => update("conversionQty", e.target.value)} />
+          <label className="pos-label">{lang === "ar" ? "كمية التحويل" : "Conversion Qty"}</label>
+          <input className="pos-input" type="number" value={form.conversionQty} onChange={(e) => update("conversionQty", e.target.value)} />
           {errors.conversionQty && <p className="text-xs text-destructive mt-1">{errors.conversionQty}</p>}
         </div>
-        <input className="pos-input" placeholder={lang === "ar" ? "ملاحظات" : "Remark"} value={form.remark} onChange={(e) => update("remark", e.target.value)} />
+        <div>
+          <label className="pos-label">{lang === "ar" ? "ملاحظات" : "Remark"}</label>
+          <input className="pos-input" value={form.remark} onChange={(e) => update("remark", e.target.value)} />
+        </div>
       </div>
       <div className="flex justify-center">
         <button className="pos-btn-primary gap-1" onClick={handleSubmit} disabled={createLink.isPending}>

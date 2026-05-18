@@ -28,7 +28,7 @@ export const APP_CONFIG = {
   defaultPaymentMode: "CREDIT CARD",
 
   /** Backend API base URL */
-  apiBaseUrl: "http://localhost:5000/api/v1",
+  apiBaseUrl: "http://localhost:5100/api/v1",
 
   /** Date/time locale */
   dateLocale: "en-GB",

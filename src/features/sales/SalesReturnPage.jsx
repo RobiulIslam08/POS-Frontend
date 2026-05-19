@@ -56,8 +56,10 @@ export default function SalesReturnPage() {
         if (found) { 
           updated.productName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; 
           updated.price = String(found.sellingPrice || ""); 
+          updated.batchCode = found.batchCode || "";
           updated.expiryDate = found.expiryDate ? new Date(found.expiryDate).toISOString().split("T")[0] : "";
         } else {
+          updated.batchCode = "";
           updated.expiryDate = "";
         }
       }

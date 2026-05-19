@@ -86,10 +86,12 @@ export default function SalesPage() {
         if (field === "code" && foundProduct) {
           updated.productName = lang === "ar" ? (foundProduct.arabicName || foundProduct.productName) : foundProduct.productName;
           updated.dbPrice = String(foundProduct.sellingPrice || "");
+          updated.batchCode = foundProduct.batchCode || "";
           updated.expiryDate = foundProduct.expiryDate ? new Date(foundProduct.expiryDate).toISOString().split("T")[0] : "";
         } else if (field === "code" && !foundProduct) {
           updated.productName = "";
           updated.dbPrice = "";
+          updated.batchCode = "";
           updated.expiryDate = "";
         }
 
@@ -198,19 +200,20 @@ export default function SalesPage() {
 
     {/* Payment section */}
     <div className="pos-card p-4">
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div><label className="pos-label">{t("sales.amountPaid")}</label><input type="number" className="pos-input" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} /></div>
-        <div><label className="pos-label">{t("sales.balance")}</label><input type="number" className="pos-input" value={balance} onChange={(e) => setBalance(e.target.value)} /></div>
-        <div><label className="pos-label">{t("sales.paymentMode")}</label><select className="pos-select" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}><option value="CREDIT CARD">{t("sales.creditCard")}</option><option value="CASH">{t("sales.cash")}</option></select></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4">
+        <div></div>
+        <div className="flex flex-col items-center">
+          <label className="pos-label text-center">{t("sales.paymentMode")}</label>
+          <select className="pos-select text-center" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
+            <option value="CREDIT CARD">{t("sales.creditCard")}</option>
+            <option value="CASH">{t("sales.cash")}</option>
+          </select>
+        </div>
+        <div className="text-center md:text-right">
+          <p className="pos-label">{t("sales.netAmount")}</p>
+          <p className="text-2xl font-bold text-primary">{t("common.sr")} {netAmount.toFixed(2)}</p>
+        </div>
       </div>
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-t border-border pt-4">
-        <div><label className="pos-label">{t("sales.amount")}</label><div className="text-sm">{totalAmount.toFixed(2)} {t("common.sr")}</div></div>
-        <div><label className="pos-label">{t("sales.discount")}</label><input type="number" className="pos-input" value={discount} onChange={(e) => setDiscount(e.target.value)} /></div>
-        <div><label className="pos-label">{t("sales.vatPercent")}</label><input type="number" className="pos-input" value={vatPercent} onChange={(e) => setVatPercent(e.target.value)} /></div>
-        <div><label className="pos-label">{t("sales.netAmount")}</label><div className="text-sm font-semibold">{netAmount.toFixed(2)}</div></div>
-        <div><label className="pos-label">{t("sales.amountPaid")}</label><input type="number" className="pos-input" value={amountPaid} readOnly /></div>
-        <div><label className="pos-label">{t("sales.balance")}</label><div className="text-sm">{balance}</div></div>
-      </div> */}
       <div className="flex justify-center gap-3 mt-6">
         <button onClick={() => { handleSave(); window.print(); }} className="pos-btn-secondary">{t("sales.print")}</button>
         <button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createSale.isPending}>

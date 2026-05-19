@@ -96,7 +96,7 @@ export default function StockPage() {
             <tr>
               <th>{t("sales.code")}</th>
               <th>{lang === "ar" ? "المنتج" : "Product"}</th>
-
+              <th>{t("sales.batchCode")}</th>
               <th>{t("sales.expiryDate")}</th>
               <th>{lang === "ar" ? "الكمية" : "Qty"}</th>
               <th className="print:hidden">{t("addProduct.storage")}</th>
@@ -121,7 +121,7 @@ export default function StockPage() {
                 <tr key={s._id || i}>
                   <td>{s.productCode || s.code}</td>
                   <td>{lang === "ar" ? (s.arabicName || s.productName || s.product) : (s.productName || s.product)}</td>
-
+                  <td>{s.batchCode || "—"}</td>
                   <td>{(() => {
                     if (!s.expiryDate) return "—";
                     try {

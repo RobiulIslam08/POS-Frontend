@@ -62,11 +62,13 @@ export default function StockCorrectionPage() {
         if (foundProduct) { 
           updated.productName = lang === "ar" ? (foundProduct.arabicName || foundProduct.productName) : foundProduct.productName; 
           updated.price = String(foundProduct.sellingPrice || ""); 
+          updated.batchCode = foundProduct.batchCode || "";
           updated.expiryDate = foundProduct.expiryDate ? new Date(foundProduct.expiryDate).toISOString().split("T")[0] : "";
           updated.quantity = String(foundProduct.quantity || 0);
         } else {
           updated.productName = "";
           updated.price = "";
+          updated.batchCode = "";
           updated.expiryDate = "";
           updated.quantity = "";
         }

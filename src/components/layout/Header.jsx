@@ -1,10 +1,14 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { APP_CONFIG } from "@/config/app.config";
+import { useSettings } from "@/hooks/useSettings";
 
 export default function Header() {
   const { t, lang, setLang } = useLanguage();
   const { logout, user } = useAuthContext();
+  const { data: settings } = useSettings();
+
+  const storeName = settings?.storeName || t("common.storeName");
 
   const now = new Date();
   const dateStr = now.toLocaleDateString(APP_CONFIG.dateLocale, {
@@ -35,7 +39,7 @@ export default function Header() {
           </div>
 
           <h1 className="hidden md:block text-xl md:text-2xl font-bold text-primary text-center flex-1">
-            {t("common.storeName")}
+            {storeName}
           </h1>
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -61,7 +65,7 @@ export default function Header() {
         </div>
 
         <h1 className="md:hidden text-lg font-bold text-primary text-center mt-2">
-          {t("common.storeName")} 
+          {storeName} 
         </h1>
       </div>
     </header>

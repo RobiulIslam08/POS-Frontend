@@ -58,6 +58,7 @@ export default function PurchaseInvoicePage() {
             updated.itemName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; 
             updated.sellingPrice = String(found.sellingPrice || ""); 
             updated.purchasePrice = String(found.purchasePrice || ""); 
+            updated.expiryDate = found.expiryDate ? new Date(found.expiryDate).toISOString().split("T")[0] : "";
           }
         }
         const qty = parseFloat(updated.totalQty) || 0;

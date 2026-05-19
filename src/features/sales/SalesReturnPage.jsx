@@ -16,7 +16,7 @@ export default function SalesReturnPage() {
   const [rows, setRows] = useState([emptyRow(1)]);
   const [paymentMode, setPaymentMode] = useState("CASH");
   const [discount, setDiscount] = useState("");
-  const [vatPercent, setVatPercent] = useState("0");
+  const [vatPercent, setVatPercent] = useState("15");
   const [amountPaid, setAmountPaid] = useState("");
   const [balance, setBalance] = useState("");
   const totalAmount = rows.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
@@ -53,7 +53,13 @@ export default function SalesReturnPage() {
       const updated = { ...r, [field]: value };
       if (field === "code") {
         const found = allProducts.find((p) => p.productCode === value || p.productId === value);
-        if (found) { updated.productName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; updated.price = String(found.sellingPrice || ""); }
+        if (found) { 
+          updated.productName = lang === "ar" ? (found.arabicName || found.productName) : found.productName; 
+          updated.price = String(found.sellingPrice || ""); 
+          updated.expiryDate = found.expiryDate ? new Date(found.expiryDate).toISOString().split("T")[0] : "";
+        } else {
+          updated.expiryDate = "";
+        }
       }
       const qty = parseFloat(updated.quantity) || 0;
       const price = parseFloat(updated.price) || 0;

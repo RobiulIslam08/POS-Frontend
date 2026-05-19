@@ -33,7 +33,7 @@ export default function SalesPage() {
   // Since row totals are inclusive of VAT, netAmount is simply totalAmount - discountAmt
   const netAmount = totalAmount - discountAmt;
   const vatAmt = (netAmount / (100 + parseFloat(vatPercent))) * parseFloat(vatPercent);
-  
+
   // Auto-calculate balance
   useEffect(() => {
     const amtPaid = parseFloat(amountPaid) || 0;
@@ -86,9 +86,11 @@ export default function SalesPage() {
         if (field === "code" && foundProduct) {
           updated.productName = lang === "ar" ? (foundProduct.arabicName || foundProduct.productName) : foundProduct.productName;
           updated.dbPrice = String(foundProduct.sellingPrice || "");
+          updated.expiryDate = foundProduct.expiryDate ? new Date(foundProduct.expiryDate).toISOString().split("T")[0] : "";
         } else if (field === "code" && !foundProduct) {
           updated.productName = "";
           updated.dbPrice = "";
+          updated.expiryDate = "";
         }
 
         if (field === "quantity" || field === "code") {
@@ -105,7 +107,7 @@ export default function SalesPage() {
         const x = currentTotal / (100 + currentVatRate);
         const vatVal = x * currentVatRate;
         const regularPrice = x * 100;
-        
+
         updated.vat = vatVal ? vatVal.toFixed(3) : "";
         updated.price = regularPrice ? regularPrice.toFixed(2) : "";
 
@@ -210,7 +212,7 @@ export default function SalesPage() {
         <div><label className="pos-label">{t("sales.balance")}</label><div className="text-sm">{balance}</div></div>
       </div> */}
       <div className="flex justify-center gap-3 mt-6">
-        <button onClick={() => window.print()} className="pos-btn-secondary">{t("sales.print")}</button>
+        <button onClick={() => { handleSave(); window.print(); }} className="pos-btn-secondary">{t("sales.print")}</button>
         <button className="pos-btn-primary gap-1" onClick={handleSave} disabled={createSale.isPending}>
           {createSale.isPending && <Loader2 size={14} className="animate-spin" />} {t("sales.save")}
         </button>

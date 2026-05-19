@@ -65,11 +65,10 @@ export default function SalesReportPage() {
         <button
           id="tab-sales"
           onClick={() => switchTab(TAB_SALES)}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            isSaleTab
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${isSaleTab
+            ? "border-primary text-primary"
+            : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
         >
           <ReceiptText size={15} />
           {lang === "ar" ? "المبيعات" : "Sales"}
@@ -77,11 +76,10 @@ export default function SalesReportPage() {
         <button
           id="tab-returns"
           onClick={() => switchTab(TAB_RETURNS)}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            !isSaleTab
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${!isSaleTab
+            ? "border-primary text-primary"
+            : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
         >
           <RotateCcw size={15} />
           {lang === "ar" ? "مرتجعات المبيعات" : "Sales Returns"}
@@ -141,11 +139,10 @@ export default function SalesReportPage() {
         {/* Tab badge */}
         <div className="px-4 py-2 border-b border-border flex items-center gap-2">
           <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              isSaleTab
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
-            }`}
+            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isSaleTab
+              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+              : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+              }`}
           >
             {isSaleTab
               ? lang === "ar" ? "مبيعات" : "SALES"
@@ -205,11 +202,10 @@ export default function SalesReportPage() {
                   <td>{rec.customer?.customerName || rec.customer || "—"}</td>
                   <td className="pos-amount">{rec.netAmount}</td>
                   <td>
-                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-                      rec.paymentMode === "CASH" || rec.paymentMode === "Cash"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                    }`}>
+                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${rec.paymentMode === "CASH" || rec.paymentMode === "Cash"
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      }`}>
                       {rec.paymentMode}
                     </span>
                   </td>
@@ -240,10 +236,10 @@ export default function SalesReportPage() {
         {/* Totals footer */}
         {records.length > 0 && (
           <div className="px-4 py-3 border-t border-border flex justify-end gap-6 text-sm">
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground font-bold text-2xl">
               {lang === "ar" ? "الإجمالي:" : "Total:"}
             </span>
-            <span className="font-bold text-primary">
+            <span className="font-bold text-primary text-2xl">
               SR {records.reduce((s, r) => s + (parseFloat(r.netAmount) || 0), 0).toFixed(2)}
             </span>
           </div>

@@ -2,18 +2,19 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useStock } from "@/hooks/useStock";
-import { Search, ClipboardCheck, Loader2, Printer } from "lucide-react";
+import { Search, ClipboardCheck, Loader2 } from "lucide-react";
 
 export default function StockPage() {
   const { t, lang } = useLanguage();
   const [keyword, setKeyword] = useState("");
-  const [warehouse, setWarehouse] = useState("main");
+  const [warehouse, setWarehouse] = useState(""); // Default to "All"
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [searchParams, setSearchParams] = useState({});
 
   const { data, isLoading } = useStock(searchParams);
   const stockItems = data?.stock || [];
+  console.log(stockItems)
 
   const handleSearch = () => {
     const p = {};
@@ -22,6 +23,18 @@ export default function StockPage() {
     if (fromDate) p.fromDate = fromDate;
     if (toDate) p.toDate = toDate;
     setSearchParams(p);
+  };
+
+  const handleKeywordChange = (value) => {
+    setKeyword(value);
+    if (!value.trim()) {
+      // Auto-trigger search when user clears the search keyword
+      setSearchParams((prev) => {
+        const copy = { ...prev };
+        delete copy.searchTerm;
+        return copy;
+      });
+    }
   };
 
   const handlePrintCountSheet = () => {
@@ -36,7 +49,7 @@ export default function StockPage() {
           className="pos-input"
           placeholder={lang === "ar" ? "كلمة المنتج" : "Product Keyword"}
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(e) => handleKeywordChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
         <select
@@ -44,6 +57,7 @@ export default function StockPage() {
           value={warehouse}
           onChange={(e) => setWarehouse(e.target.value)}
         >
+          <option value="">{lang === "ar" ? "كل المستودعات / المواقع" : "All Warehouses / Locations"}</option>
           <option value="main">Main Warehouse</option>
           <option value="secondary">Secondary Warehouse</option>
         </select>
@@ -80,12 +94,12 @@ export default function StockPage() {
         <table className="pos-table min-w-[900px]">
           <thead>
             <tr>
-              <th>{lang === "ar" ? "الكود" : "Code"}</th>
+              <th>{t("sales.code")}</th>
               <th>{lang === "ar" ? "المنتج" : "Product"}</th>
-              <th>{lang === "ar" ? "الدفعة" : "Batch"}</th>
-              <th>{lang === "ar" ? "الإكسปاير" : "Expiry"}</th>
+
+              <th>{t("sales.expiryDate")}</th>
               <th>{lang === "ar" ? "الكمية" : "Qty"}</th>
-              <th className="print:hidden">{lang === "ar" ? "الموقع" : "Location"}</th>
+              <th className="print:hidden">{t("addProduct.storage")}</th>
               <th className="hidden print:table-cell w-32">{lang === "ar" ? "العد الفعلي" : "Actual Count"}</th>
             </tr>
           </thead>
@@ -106,11 +120,18 @@ export default function StockPage() {
               stockItems.map((s, i) => (
                 <tr key={s._id || i}>
                   <td>{s.productCode || s.code}</td>
-                  <td>{s.productName || s.product}</td>
-                  <td>{s.batch || "—"}</td>
-                  <td>{s.expiryDate ? new Date(s.expiryDate).toLocaleDateString() : "—"}</td>
+                  <td>{lang === "ar" ? (s.arabicName || s.productName || s.product) : (s.productName || s.product)}</td>
+
+                  <td>{(() => {
+                    if (!s.expiryDate) return "—";
+                    try {
+                      return new Date(s.expiryDate).toISOString().split("T")[0];
+                    } catch (e) {
+                      return "—";
+                    }
+                  })()}</td>
                   <td className="font-bold">{s.quantity}</td>
-                  <td className="print:hidden">{s.location || s.storage || "—"}</td>
+                  <td className="print:hidden">{s.storage || s.location || "—"}</td>
                   <td className="hidden print:table-cell border-l border-dashed"></td>
                 </tr>
               ))

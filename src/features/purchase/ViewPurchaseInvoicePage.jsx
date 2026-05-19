@@ -68,10 +68,10 @@ export default function ViewPurchaseInvoicePage() {
               <div><p className="text-muted-foreground">{t("purchase.paymentMethod")}</p><p className="font-semibold uppercase">{selectedPurchase.paymentMethod}</p></div>
             </div>
             <table className="pos-table text-xs">
-              <thead><tr><th>{t("purchase.itemName")}</th><th>{t("purchase.batch")}</th><th>{t("purchase.totalQty")}</th><th>{t("purchase.purchasePrice")}</th><th>{t("purchase.netAmount")}</th></tr></thead>
+              <thead><tr><th>{t("purchase.itemName")}</th><th>{t("purchase.batch")}</th><th>{t("sales.expiryDate")}</th><th>{t("purchase.totalQty")}</th><th>{t("purchase.purchasePrice")}</th><th>{t("purchase.netAmount")}</th></tr></thead>
               <tbody>
                 {selectedPurchase.items?.map((item, idx) => (
-                  <tr key={idx}><td>{item.itemName}</td><td>{item.batch || "—"}</td><td>{item.totalQty}</td><td>{item.purchasePrice}</td><td>{item.netAmount}</td></tr>
+                  <tr key={idx}><td>{item.itemName}</td><td>{item.batch || "—"}</td><td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "—"}</td><td>{item.totalQty}</td><td>{item.purchasePrice}</td><td>{item.netAmount}</td></tr>
                 ))}
               </tbody>
             </table>

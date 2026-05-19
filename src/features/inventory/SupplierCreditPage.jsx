@@ -70,8 +70,8 @@ export default function SupplierCreditPage() {
         <thead><tr><th>Supplier</th><th>Invoice</th><th>Paid Amount</th><th>Date</th><th>Method</th><th>Status</th></tr></thead>
         <tbody>
           {isLoading ? <tr><td colSpan={6} className="text-center py-8"><Loader2 size={20} className="animate-spin inline-block" /></td></tr>
-          : payments.length === 0 ? <tr><td colSpan={6} className="text-center text-muted-foreground">{lang === "ar" ? "لا يوجد دفعات مسجلة" : "No payments recorded"}</td></tr>
-          : payments.map((p) => <tr key={p._id}><td>{p.supplier}</td><td>{p.invoiceNo}</td><td>SR {p.paidAmount}</td><td>{new Date(p.paymentDate).toLocaleDateString()}</td><td>{p.paymentMethod}</td><td>{p.status}</td></tr>)}
+            : payments.length === 0 ? <tr><td colSpan={6} className="text-center text-muted-foreground">{lang === "ar" ? "لا يوجد دفعات مسجلة" : "No payments recorded"}</td></tr>
+              : payments.map((p) => <tr key={p._id}><td>{p.supplier}</td><td>{p.invoiceNo}</td><td>SR {p.paidAmount}</td><td>{new Date(p.paymentDate).toLocaleDateString()}</td><td>{p.paymentMethod}</td><td>{p.status}</td></tr>)}
         </tbody>
       </table>
     </div>

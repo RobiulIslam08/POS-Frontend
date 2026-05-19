@@ -17,11 +17,13 @@ export default function AddProductPage() {
     quantity: "",
     packageVal: "",
     arabicName: "",
-    vat: "",
+    vat: "15",
     mrp: "",
     purchasePrice: "",
     sellingPrice: "",
     storage: "",
+    batchCode: "",
+    expiryDate: "",
     minQty: "1",
     productType: "SINGLE",
     boxQty: "1",
@@ -47,6 +49,8 @@ export default function AddProductPage() {
       purchasePrice: Number(form.purchasePrice) || 0,
       sellingPrice: Number(form.sellingPrice) || 0,
       storage: form.storage.trim() || undefined,
+      batchCode: form.batchCode.trim() || undefined,
+      expiryDate: form.expiryDate || undefined,
       minQty: Number(form.minQty) || 1,
       productType: form.productType,
       boxQty: Number(form.boxQty) || 1,
@@ -103,6 +107,14 @@ export default function AddProductPage() {
           <div>
             <label className="pos-label">{t("addProduct.storage")}</label>
             <input type="text" className="pos-input" value={form.storage} onChange={(e) => update("storage", e.target.value)} />
+          </div>
+          <div>
+            <label className="pos-label">{t("sales.batchCode")}</label>
+            <input type="text" className="pos-input" value={form.batchCode} onChange={(e) => update("batchCode", e.target.value)} />
+          </div>
+          <div>
+            <label className="pos-label">{t("addProduct.expiryDate")}</label>
+            <input type="date" className="pos-input" value={form.expiryDate} onChange={(e) => update("expiryDate", e.target.value)} />
           </div>
           <div>
             <label className="pos-label">{t("addProduct.arabicName")}</label>

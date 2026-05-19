@@ -211,8 +211,8 @@ export default function BarcodePage() {
           <thead><tr><th>#</th><th>{lang === "ar" ? "كود المنتج" : "Product Code"}</th><th>{lang === "ar" ? "الباركود" : "Barcode"}</th><th>{lang === "ar" ? "العدد" : "Count"}</th><th>{lang === "ar" ? "الحجم" : "Size"}</th><th>{lang === "ar" ? "النوع" : "Type"}</th><th>{lang === "ar" ? "التاريخ" : "Date"}</th></tr></thead>
           <tbody>
             {jobsLoading ? <tr><td colSpan={7} className="text-center py-8"><Loader2 size={20} className="animate-spin inline-block" /></td></tr>
-            : jobs.length === 0 ? <tr><td colSpan={7} className="text-center text-muted-foreground py-6">{lang === "ar" ? "لا يوجد سجلات" : "No jobs yet"}</td></tr>
-            : jobs.map((j, i) => <tr key={j._id}><td>{i + 1}</td><td>{j.productCode}</td><td>{j.barcodeValue}</td><td>{j.labelCount}</td><td>{j.paperSize}</td><td>{j.printType}</td><td>{new Date(j.createdAt).toLocaleDateString()}</td></tr>)}
+              : jobs.length === 0 ? <tr><td colSpan={7} className="text-center text-muted-foreground py-6">{lang === "ar" ? "لا يوجد سجلات" : "No jobs yet"}</td></tr>
+                : jobs.map((j, i) => <tr key={j._id}><td>{i + 1}</td><td>{j.productCode}</td><td>{j.barcodeValue}</td><td>{j.labelCount}</td><td>{j.paperSize}</td><td>{j.printType}</td><td>{new Date(j.createdAt).toLocaleDateString()}</td></tr>)}
           </tbody>
         </table>
       </div>

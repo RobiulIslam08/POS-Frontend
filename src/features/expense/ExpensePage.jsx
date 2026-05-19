@@ -128,11 +128,10 @@ export default function ExpensePage() {
                 <td>SR {e.netAmount}</td>
                 <td>
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded ${
-                      e.status === "Approved"
+                    className={`text-xs px-1.5 py-0.5 rounded ${e.status === "Approved"
                         ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                    }`}
+                      }`}
                   >
                     {e.status}
                   </span>

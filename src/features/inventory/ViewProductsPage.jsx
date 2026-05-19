@@ -28,13 +28,13 @@ export default function ViewProductsPage() {
 
   const startEdit = useCallback((product) => {
     setEditingId(product._id);
-    setEditForm({ productName: product.productName, formulation: product.formulation || "", arabicName: product.arabicName || "", vat: product.vat, mrp: product.mrp, purchasePrice: product.purchasePrice, sellingPrice: product.sellingPrice, quantity: product.quantity, minQty: product.minQty, storage: product.storage || "" });
+    setEditForm({ productName: product.productName, formulation: product.formulation || "", arabicName: product.arabicName || "", vat: product.vat, mrp: product.mrp, purchasePrice: product.purchasePrice, sellingPrice: product.sellingPrice, quantity: product.quantity, minQty: product.minQty, storage: product.storage || "", batchCode: product.batchCode || "", expiryDate: product.expiryDate ? new Date(product.expiryDate).toISOString().split("T")[0] : "" });
   }, []);
 
   const cancelEdit = () => { setEditingId(null); setEditForm({}); };
 
   const saveEdit = () => {
-    updateProduct.mutate({ id: editingId, data: { productName: editForm.productName, formulation: editForm.formulation || undefined, arabicName: editForm.arabicName || undefined, vat: Number(editForm.vat), mrp: Number(editForm.mrp), purchasePrice: Number(editForm.purchasePrice), sellingPrice: Number(editForm.sellingPrice), quantity: Number(editForm.quantity), minQty: Number(editForm.minQty), storage: editForm.storage || undefined } }, { onSuccess: cancelEdit });
+    updateProduct.mutate({ id: editingId, data: { productName: editForm.productName, formulation: editForm.formulation || undefined, arabicName: editForm.arabicName || undefined, vat: Number(editForm.vat), mrp: Number(editForm.mrp), purchasePrice: Number(editForm.purchasePrice), sellingPrice: Number(editForm.sellingPrice), quantity: Number(editForm.quantity), minQty: Number(editForm.minQty), storage: editForm.storage || undefined, batchCode: editForm.batchCode || undefined, expiryDate: editForm.expiryDate || undefined } }, { onSuccess: cancelEdit });
   };
 
   const ef = (key, val) => setEditForm((f) => ({ ...f, [key]: val }));
@@ -49,11 +49,11 @@ export default function ViewProductsPage() {
       </div>
     </div>
     <div className="pos-card overflow-x-auto">
-      <table className="pos-table min-w-[1000px]">
-        <thead><tr><th>{t("addProduct.productCode")}</th><th>{t("sales.productName")}</th><th>{t("viewProducts.formulation")}</th><th>{t("addProduct.vat")}</th><th>{t("viewProducts.arabicName")}</th><th>{t("viewProducts.storage")}</th><th>{t("sales.quantity")}</th><th>{t("viewProducts.minQty")}</th><th>{t("viewProducts.mrp")}</th><th>{t("viewProducts.purchasePrice")}</th><th>{t("viewProducts.sellingPrice")}</th><th>{t("viewProducts.edit")}</th></tr></thead>
+      <table className="pos-table min-w-[1400px]">
+        <thead><tr><th>{t("addProduct.productCode")}</th><th>{t("sales.productName")}</th><th>{t("viewProducts.formulation")}</th><th>{t("addProduct.vat")}</th><th>{t("viewProducts.arabicName")}</th><th>{t("viewProducts.storage")}</th><th>{t("sales.batchCode")}</th><th>{t("sales.expiryDate")}</th><th>{t("sales.quantity")}</th><th>{t("viewProducts.minQty")}</th><th>{t("viewProducts.mrp")}</th><th>{t("viewProducts.purchasePrice")}</th><th>{t("viewProducts.sellingPrice")}</th><th>{t("viewProducts.edit")}</th></tr></thead>
         <tbody>
-          {isLoading ? (<tr><td colSpan={12} className="text-center py-8"><Loader2 size={20} className="animate-spin inline-block" /></td></tr>)
-          : products.length === 0 ? (<tr><td colSpan={12} className="text-center text-muted-foreground py-8">{t("viewProducts.search")}</td></tr>)
+          {isLoading ? (<tr><td colSpan={14} className="text-center py-8"><Loader2 size={20} className="animate-spin inline-block" /></td></tr>)
+          : products.length === 0 ? (<tr><td colSpan={14} className="text-center text-muted-foreground py-8">{t("viewProducts.search")}</td></tr>)
           : products.map((p) => (<tr key={p._id}>
             <td>{p.productCode}</td>
             <td>{editingId === p._id ? <input className="pos-input" value={editForm.productName} onChange={(e) => ef("productName", e.target.value)} /> : p.productName}</td>
@@ -70,6 +70,8 @@ export default function ViewProductsPage() {
             <td>{editingId === p._id ? <select className="pos-select" value={editForm.vat} onChange={(e) => ef("vat", e.target.value)}><option value="0">0%</option><option value="5">5%</option><option value="15">15%</option></select> : `${p.vat}%`}</td>
             <td>{editingId === p._id ? <input className="pos-input" dir="rtl" value={editForm.arabicName} onChange={(e) => ef("arabicName", e.target.value)} /> : p.arabicName || "—"}</td>
             <td>{editingId === p._id ? <input className="pos-input" value={editForm.storage} onChange={(e) => ef("storage", e.target.value)} /> : p.storage || "—"}</td>
+            <td>{editingId === p._id ? <input className="pos-input w-28" type="text" placeholder="Batch" value={editForm.batchCode} onChange={(e) => ef("batchCode", e.target.value)} /> : p.batchCode || "—"}</td>
+            <td>{editingId === p._id ? <input className="pos-input w-32" type="date" value={editForm.expiryDate} onChange={(e) => ef("expiryDate", e.target.value)} /> : (p.expiryDate ? new Date(p.expiryDate).toISOString().split("T")[0] : "—")}</td>
             <td>{editingId === p._id ? <input className="pos-input w-20" type="number" value={editForm.quantity} onChange={(e) => ef("quantity", e.target.value)} /> : p.quantity}</td>
             <td>{editingId === p._id ? <input className="pos-input w-20" type="number" value={editForm.minQty} onChange={(e) => ef("minQty", e.target.value)} /> : p.minQty}</td>
             <td>{editingId === p._id ? <input className="pos-input w-24" type="number" value={editForm.mrp} onChange={(e) => ef("mrp", e.target.value)} /> : p.mrp}</td>

@@ -108,6 +108,7 @@
   "addProduct.purchasePrice": "سعر الشراء",
   "addProduct.sellingPrice": "سعر البيع",
   "addProduct.storage": "التخزين",
+  "addProduct.expiryDate": "تاريخ الانتهاء",
   "addProduct.minQty": "الحد الأدنى للكمية",
   "addProduct.productType": "نوع المنتج",
   "addProduct.boxQty": "كمية الصندوق",

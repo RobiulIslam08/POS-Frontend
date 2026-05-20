@@ -22,8 +22,10 @@ export default function SettingsPage() {
     defaultPayment: "Cash",
     timezone: "Asia/Riyadh",
     supportContact: "",
-    lowStockAlert: "10",
+    lowStockAlert: 10,
     allowNegativeStock: "no",
+    storeAddress: "",
+    crNumber: "",
   });
   const [errors, setErrors] = useState({});
   const [isDiagnosing, setIsDiagnosing] = useState(false);
@@ -47,7 +49,11 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     if (!canSave || !validate()) return;
-    updateSettings.mutate(form);
+    const submissionData = {
+      ...form,
+      lowStockAlert: form.lowStockAlert === "" ? undefined : Number(form.lowStockAlert),
+    };
+    updateSettings.mutate(submissionData);
   };
 
   const runDiagnostics = async () => {
@@ -118,6 +124,24 @@ export default function SettingsPage() {
             {errors.vatNumber && <p className="text-xs text-destructive mt-1">{errors.vatNumber}</p>}
           </div>
           <div>
+            <label className="pos-label">{lang === "ar" ? "السجل التجاري" : "CR Number"}</label>
+            <input
+              className="pos-input"
+              value={form.crNumber || ""}
+              onChange={(e) => update("crNumber", e.target.value)}
+              placeholder="e.g. 7006133065"
+            />
+          </div>
+          <div>
+            <label className="pos-label">{lang === "ar" ? "عنوان المتجر" : "Store Address"}</label>
+            <input
+              className="pos-input"
+              value={form.storeAddress || ""}
+              onChange={(e) => update("storeAddress", e.target.value)}
+              placeholder="e.g. خميس مشيط - مخطط الحسام"
+            />
+          </div>
+          <div>
             <label className="pos-label">{lang === "ar" ? "بادئة الفاتورة" : "Invoice Prefix"}</label>
             <input
               className="pos-input"
@@ -155,7 +179,10 @@ export default function SettingsPage() {
               className="pos-input"
               type="number"
               value={form.lowStockAlert}
-              onChange={(e) => update("lowStockAlert", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                update("lowStockAlert", val === "" ? "" : Number(val));
+              }}
             />
           </div>
           <div>
@@ -194,6 +221,12 @@ export default function SettingsPage() {
           </div>
           <div>
             <strong>VAT:</strong> {form.vatNumber}
+          </div>
+          <div>
+            <strong>CR Number:</strong> {form.crNumber || "—"}
+          </div>
+          <div>
+            <strong>Address:</strong> {form.storeAddress || "—"}
           </div>
           <div>
             <strong>Invoice Prefix:</strong> {form.invoicePrefix}

@@ -28,7 +28,8 @@ export const APP_CONFIG = {
   defaultPaymentMode: "CREDIT CARD",
 
   /** Backend API base URL */
-  apiBaseUrl: "http://localhost:5100/api/v1",
+  // apiBaseUrl: "http://localhost:5100/api/v1",
+  apiBaseUrl: "https://pos-backend-phi-one.vercel.app/",
 
   /** Date/time locale */
   dateLocale: "en-GB",

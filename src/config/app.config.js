@@ -29,7 +29,7 @@ export const APP_CONFIG = {
 
   /** Backend API base URL */
   // apiBaseUrl: "http://localhost:5100/api/v1",
-  apiBaseUrl: "https://pos-backend-phi-one.vercel.app/",
+  apiBaseUrl: "https://pos-backend-phi-one.vercel.app/api/v1",
 
   /** Date/time locale */
   dateLocale: "en-GB",
